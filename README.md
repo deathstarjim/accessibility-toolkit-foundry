@@ -1,103 +1,151 @@
-> **Based on the original [Accessibility Enhancements](https://github.com/silvative/accessibility-enhancements) module by [Cora (silvative)](https://github.com/silvative). This fork adapts the module for D&D 5e (dnd5e2) on Foundry VTT v13.**
+# Accessibility Toolkit
 
-This module provides several minor modifications to the Foundry interface in order to improve accessibility.
+> **Based on the original [Accessibility Enhancements](https://github.com/silvative/accessibility-enhancements) module by [Cora (silvative)](https://github.com/silvative).**  
+> This project started as a fork and has grown into a broader accessibility toolkit for Foundry VTT.
 
-It's far from perfect - there are a lot of places with obvious paths for improvement that I have not taken due to a lack of time or skill. About the best I can say is that I did better than I had expected - this module's goal is more about getting the player experience closer to serviceable by patching obvious holes while we wait for core improvements. My hope is that others will see the terrible job I've done and be inspired to outdo me. To that end, I've listed some of the known issues and limitations in this readme file- perhaps they can serve as inspiration to someone.
+Accessibility Toolkit adds keyboard-first and screen-reader-friendly improvements to Foundry VTT, with the current implementation focused primarily on **D&D 5e on Foundry VTT v13**.
 
-**Code contributions are very, very welcome. I do not personally use a screen reader, so any support that can be offered is appreciated.**
+## Current Scope
 
-# Features
+The long-term goal is for this project to become more system-agnostic where possible. Right now, the most complete and actively developed support is for:
 
-Note: All features can be toggled per-client in the module settings.
+- Foundry VTT v13
+- D&D 5e system
+- Tidy 5e Sheets and the default D&D 5e actor sheets
 
-## Drag & Drop Alternatives
+Some older features from the original module are still present and may apply to other systems, but the current accessibility work is centered on D&D 5e.
 
-The module provides two new ways to add items to a character that do not require drag and drop.
+## What It Does
 
-(Note: A Foundry Item is a document which is added to an Actor. It encompasses the Pathfinder concepts of feats, actions, effects, ancestries, equipment, etc, not only physical objects.)
+### Character Sheet Keyboard Navigation
 
-  - probably only works in Pathfinder 2e
-  - requires the core "create new items" permission to be enabled for the user
-  - uses the controlled token, and will fall back to the assigned actor if the former is not found. This means that you can theoretically now add items to familiars and animal companions too, if you are able to select their token. This hasn't been tested yet. 
-    - it'd be better if there was some kind of drop-down, maybe one that could check which sheet it had been opened from or which sheets are open
-  - doesn't ask which feat slot to place a feat in, nor which spell list, which means it can't be used for spells at all and always puts feats in the "bonus feats" slot.
+Accessibility Toolkit adds keyboard support to D&D 5e character sheets, including:
 
-### Button
+- returning focus to the active sheet tab with `Alt+T`
+- moving between tab controls with `Tab` / `Shift+Tab`
+- activating tabs with `Enter`
+- moving into the active panel and cycling through interactive controls
+- leaving sheet focus cleanly with `Escape` or `Ctrl+Shift+Tab`
+- spoken guidance when keyboard focus first enters a supported character sheet
 
-If a compendium of items is open, the module adds a button beside each displayed item. Clicking on the button adds a copy of that item to your character.
+Supported sheet implementations currently include:
 
-- I'd like to add the button to the compendium browser and the compendium sidebar tab too.
+- default D&D 5e actor sheets
+- Tidy 5e Sheets, including the modern layout
 
-### Hotkey
+### Inventory, Spell, and Action Flows
 
-Registers a hotkey (currently 'X') which checks every element beneath the mouse cursor. If any of them correspond to an item document, it tries to add it to the actor in the same way as the above. Unlike the dedicated button, this hotkey supports the compendium browser and the compendium sidebar.
+The module improves keyboard access to common row actions on supported D&D 5e sheets:
 
-The hotkey cannot be rebound but it can be disabled in the module settings.
+- inventory row actions
+- spell row actions
+- attack and use/roll buttons
+- item context menus on Tidy 5e sheets
+- roll configuration dialogs
 
-- It'd be neat if this would prioritise the screen reader's "focused" element over the hovered one if one was present, but I'm not sure what selector to use for that.
+It also restores focus back to the originating row after many attack and consumable flows complete, which makes repeated keyboard use much less frustrating.
 
-## Audio Feedback
+### Keyboard-First Target Selection and Combat Follow-Up
 
-Adds sound cues for certain actions to provide non-visual feedback that they were executed successfully.
+For D&D 5e attack and consumable flows, the module adds accessible target selection and follow-up handling:
 
-### Create Item
+- keyboard target selection instead of relying on mouse-only targeting
+- distance-aware target ordering
+- self-first consumable targeting when appropriate
+- hit/miss follow-up dialogs
+- direct damage and healing application flows
+- GM-mediated damage/healing application for players acting on unowned enemy tokens
 
-Plays a "rummaging" sound on the "createItem" hook. Helps to provide feedback that you successfully added an item to your sheet.
+This is meant to reduce or remove the need to chase chat cards and hover-only controls during combat.
 
-### Render Application
+### Screen Reader Announcements
 
-Plays a "ding" sound effect on the "renderApplication" hook. That doesn't cover every time a new window is opened but it does cover a lot, including cases like choiceset popups which were previously not signposted to screen readers at all.
+The module includes screen reader live-region announcements for several Foundry events and gameplay states, including:
 
-- It would be better if we drew the screenreader's focus to new applications instead, but that's more difficult.
-  - Apparently the "sell all treasure" button does this correctly - copy whatever it's doing? Something to do with web dialogs.
+- chat messages
+- roll results
+- combat turn changes
+- UI notifications
+- token movement
+- tokens entering or leaving the current scene
+- HP / damage changes on owned actors
+- status effects and condition changes on owned actors
 
-## Alternate Token Interactions
+There is also an `Alt+R` shortcut to re-read the most recent roll result.
 
-Some users use trackpads or touch interfaces or other control schemas that don't support right click. Some people don't want to relearn their existing muscle memory. Some people just irrationally hate right clicks. For good or for ill, we want to empower you.
+### Helpful Keyboard Shortcuts
 
-The module adds a setting (disabled by default) which give an alternate way to open the Token HUD.
+Current shortcuts include:
 
-- Seems to behave kind of strangely sometimes, not extensively tested yet
-- I'd love to support clicking on an unowned token to target it, but I haven't spent much time on getting it working yet
+- `Alt+T`: return focus to the active sheet tab
+- `Alt+R`: read the latest roll result
+- `Alt+C`: open your current character sheet
+- `Alt+Shift+A`: open Accessibility Toolkit settings
+- `Alt+Shift+K`: open Configure Controls
+- `W`: announce the controlled token's current position, HP, and conditions
+- `Enter` / `Shift+Enter`: keyboard token interactions on the canvas
 
-## High Contrast Character Sheets
+Many of these can be changed through Foundry's normal controls configuration.
 
-**PF2E Player character sheet only**
+## Additional Features Still Included
 
-Adds an optional override (configured in module settings) which takes a hatchet to the PC character sheet to offer a "high-contrast" option. Both a dark and a light mode are offered. 
+The module still includes some older or secondary features from the original project and earlier fork work:
 
-- The setting is clientside and applies to all character sheets. It doesn't affect how other users see the sheets.
-- Though I would be happy if they enjoyed it, this setting was not primarily intended to appeal to users who are seeking a "conventional" dark mode character sheet. The goal was to maximise contrast, not prioritise aesthetics.
-- This setting may make the sheets harder to use for many users, especially in places where the colours were used to convey information. There may be some places (like the proficiency dropdown selector) which look objectively worse. 
-- There were several fields which sadly did not use variables to set their colours, requiring me to use gross overrides or important tags which are not best practice ordinarily. I would prefer to do this inside the system, but that will take additional investigation.
+- optional audio cues
+- alternate token interaction options
+- add-item helpers for item acquisition without drag-and-drop
+- image preview helpers
+- high-contrast sheet styling experiments
 
-Preview images:
+Some of these are system-specific, older, or less actively maintained than the D&D 5e sheet/navigation work. If you use them, expect more rough edges.
 
-![image](https://github.com/silvative/accessibility-enhancements/assets/66365038/29aea8d5-128d-48ac-baa3-a29b36d56e6e)
-![image](https://github.com/silvative/accessibility-enhancements/assets/66365038/cebe67b5-b10a-4323-90f8-079c227117bb)
+## Installation
 
-(Pictures of the high-contrast character sheets, which remove all coloured elements from the character sheets and maximise contrast, prioritising readability over aesthetics. There is a dark and light mode option.)
+Install using the `module.json` manifest from the latest GitHub release.
 
-## Compendium Browser Image Preview
+If you are testing development builds manually, make sure the manifest and download URLs match real public assets and that the release zip contains `module.json` at the root.
 
-**PF2E system only** (obviously)
+## Limitations
 
-Displays a creature's portrait artwork in an enlarged thumbnail (5 size options) when its icon is hovered in the compendium browser. Useful if you find the default icon size too small to make out any detail.
+- Current accessibility support is strongest on D&D 5e.
+- Tidy 5e and default D&D 5e sheets are actively supported; other sheet systems are not guaranteed.
+- Some legacy features in this repo predate the current D&D 5e focus and may not be polished.
+- Accessibility is still an ongoing effort; there are almost certainly workflows that need refinement.
 
-![gif](https://github.com/silvative/accessibility-enhancements/assets/66365038/c1e7edaf-8656-42c2-b18b-f0971d2b7a34)
+## Bugs and Enhancements
 
+Bug reports, accessibility feedback, and enhancement requests should be submitted through GitHub issues.
 
+When reporting a bug, please include:
 
-(A brief video clip of the portrait preview, using the artwork from the Token Pack: Bestaries module for demonstrative purposes.)
+- Foundry version
+- game system and version
+- whether you are using the default sheet or Tidy 5e
+- any relevant supporting modules
+- exact reproduction steps
 
-# Removed Features
+When suggesting an enhancement, please describe the accessibility problem you are trying to solve and what the expected keyboard or screen-reader workflow should be.
 
-These features appeared in older versions of the module but are no longer active.
+## Screenshots
 
-## Labelled fields (Rendered unnecessary by core change as of build 11.306)
+This README is ready for screenshots, but the current image set still needs to be refreshed to match the modern D&D 5e-focused feature set.
 
-Several static UI elements have been given a label which allows screen readers to determine their function. This mostly affects buttons like the sidebar tab buttons or the scene controls, which don't have any inner text to fall back on and so weren't very accessible.
+Recommended screenshots to add:
 
-Uses manually chosen labels for some and attempts to fallback automatically generated labels for others. I welcome feedback on labels which are unclear or too long, and any buttons which are missing labels.
+- default D&D 5e character sheet with active tab focus
+- Tidy 5e sheet showing keyboard-accessible inventory actions
+- accessible target picker dialog
+- Accessibility Toolkit settings in Foundry
 
-(Note: *IN THEORY*, this should work with modules that add new buttons to these locations, since I didn't hardcode any of the values. No guarantees though.)
+Suggested filenames:
+
+- `assets/screenshots/default-sheet-tabs.png`
+- `assets/screenshots/tidy-sheet-inventory.png`
+- `assets/screenshots/target-picker.png`
+- `assets/screenshots/settings-panel.png`
+
+## Contributing
+
+Code contributions are very welcome.
+
+I do not personally use a screen reader, so direct feedback from players who do is especially valuable. Real testing feedback is often more useful than theoretical accessibility guesses.

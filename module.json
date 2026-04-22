@@ -1,7 +1,7 @@
 {
-  "id": "accessibility-enhancements",
-  "title": "Accessibility Enhancements",
-  "description": "Minor modifications to the Foundry interface to improve accessibility",
+  "id": "accessibility-toolkit",
+  "title": "Accessibility Toolkit",
+  "description": "Accessibility toolkit for Foundry VTT, currently focused on D&D 5e support",
   "version": "0.5.1",
   "authors": [
     {
