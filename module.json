@@ -1,0 +1,36 @@
+{
+  "id": "accessibility-enhancements",
+  "title": "Accessibility Enhancements",
+  "description": "Minor modifications to the Foundry interface to improve accessibility",
+  "version": "0.5.1",
+  "authors": [
+    {
+      "name": "Cora"
+    }
+  ],
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "socket": true,
+  "scripts": [
+    "scripts/additems.js",
+    "scripts/audiocues.js",
+    "scripts/labeler.js",
+    "scripts/norightclick.js",
+    "scripts/highcontrast.js",
+    "scripts/imagepreview.js",
+    "scripts/screenreader.js"
+  ],
+  "esmodules": [
+    "scripts/sheettabs.js"
+  ],
+  "styles": [
+    "styles/main.css"
+  ],
+  "url": "https://github.com/deathstarjim/accessibility-enhancements-foundry-v13",
+  "manifest": "https://github.com/deathstarjim/accessibility-enhancements-foundry-v13/releases/latest/download/module.json",
+  "download": "https://github.com/deathstarjim/accessibility-enhancements-foundry-v13/releases/download/0.5.1/module.zip",
+  "readme": "https://github.com/deathstarjim/accessibility-enhancements-foundry-v13#readme",
+  "changelog": "https://github.com/deathstarjim/accessibility-enhancements-foundry-v13#changelog"
+}
