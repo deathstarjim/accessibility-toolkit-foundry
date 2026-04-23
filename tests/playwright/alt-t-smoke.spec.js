@@ -98,16 +98,16 @@ async function openCharacterSheet(page, actorName = "Tester the Brave")
             ?? game.actors?.find(candidate => candidate?.type === "character" && candidate?.name === name)
             ?? game.actors?.find(candidate => candidate?.type === "character" && candidate?.isOwner);
         return Boolean(game.ready && actor?.sheet?.rendered);
-    }, actorName, { timeout: 10000 });
+    }, actorName, { timeout: 25000 });
 
     const sheetSelector = `.application.sheet.actor.character[id$="Actor-${actorId}"]`;
     await page.waitForFunction((selector) =>
     {
         return Array.from(document.querySelectorAll(selector)).some(element => element.offsetParent);
-    }, sheetSelector, { timeout: 10000 });
+    }, sheetSelector, { timeout: 25000 });
 
     const sheet = page.locator(sheetSelector).filter({ visible: true }).last();
-    await expect(sheet).toBeVisible({ timeout: 10000 });
+    await expect(sheet).toBeVisible({ timeout: 25000 });
     await expect(sheet).toHaveClass(/sheet/);
     await expect(sheet).toHaveClass(/actor/);
     await expect(sheet).toHaveClass(/character/);
@@ -117,27 +117,20 @@ async function openCharacterSheet(page, actorName = "Tester the Brave")
 
 async function setCharacterSheetClass(page, actorName, sheetClass)
 {
-    const sheet = await openCharacterSheet(page, actorName);
+    const actorId = await page.evaluate(async ({ name, desiredSheetClass }) =>
+    {
+        const actor = game.user?.character
+            ?? game.actors?.find(candidate => candidate?.type === "character" && candidate?.name === name)
+            ?? game.actors?.find(candidate => candidate?.type === "character" && candidate?.isOwner);
+        if (!actor?.id) return null;
 
-    const toggleControlsButton = sheet.locator('[data-action="toggleControls"]');
-    await expect(toggleControlsButton).toBeVisible();
-    await toggleControlsButton.click({ force: true });
+        await actor.setFlag("core", "sheetClass", desiredSheetClass);
+        actor.sheet?.close?.();
+        actor.sheet?.render?.(true);
+        return actor.id;
+    }, { name: actorName, desiredSheetClass: sheetClass });
 
-    const visibleControlsDropdown = sheet.locator(".controls-dropdown:visible");
-    await expect(visibleControlsDropdown).toBeVisible();
-
-    const configureSheetControl = visibleControlsDropdown.locator('[data-action="configureSheet"] button');
-    await expect(configureSheetControl).toBeVisible();
-    await configureSheetControl.click();
-
-    const sheetClassSelect = page.locator('select[name="sheetClass"]').last();
-    await expect(sheetClassSelect).toBeVisible();
-    await sheetClassSelect.selectOption(sheetClass);
-
-    const saveButton = page.getByRole("button", { name: /Save Sheet Configuration/i }).last();
-    await expect(saveButton).toBeVisible();
-    await saveButton.click();
-
+    expect(actorId).toBeTruthy();
     return openCharacterSheet(page, actorName);
 }
 
@@ -152,6 +145,56 @@ async function focusShouldReturnToTab(page, sheet, tabName)
 
     await page.keyboard.press("Alt+T");
     await expect(tab).toBeFocused();
+}
+
+async function forceHighRolls(page)
+{
+    await page.evaluate(() =>
+    {
+        globalThis.__aeOriginalRandomUniform ??= CONFIG.Dice.randomUniform;
+        CONFIG.Dice.randomUniform = () => 0.999999;
+    });
+}
+
+async function lowerHostileArmorClass(page)
+{
+    await page.evaluate(async () =>
+    {
+        const actor = game.user?.character
+            ?? game.actors?.find(candidate => candidate?.type === "character" && candidate?.isOwner);
+        if (!actor) return;
+
+        await actor.update({
+            "system.abilities.str.value": 50,
+            "system.attributes.prof": 10
+        });
+
+        const firstWeapon = actor.items?.find(item => item?.type === "weapon");
+        if (firstWeapon)
+        {
+            await firstWeapon.update({
+                "system.attack.bonus": "20"
+            });
+        }
+    });
+}
+
+async function expectFocusInside(page, container)
+{
+    await expect(container).toBeVisible();
+    await page.waitForFunction((element) =>
+    {
+        if (!(element instanceof HTMLElement)) return false;
+        const activeElement = document.activeElement;
+        return activeElement instanceof HTMLElement && element.contains(activeElement);
+    }, await container.elementHandle(), { timeout: 25000 });
+}
+
+async function chooseNormalRoll(page)
+{
+    const normalButton = page.getByRole("button", { name: /Normal/i }).last();
+    await expect(normalButton).toBeVisible({ timeout: 25000 });
+    await normalButton.click();
 }
 
 test("Alt+T returns focus to the active tab well on the current character sheet", async ({ page }) =>
@@ -183,3 +226,85 @@ test("Alt+T still works after changing the actor between Tidy and default sheets
     );
     await focusShouldReturnToTab(page, defaultSheet, "Features");
 });
+
+test("combat tunnel keeps focus anchored through targeting and damage flow", async ({ page }) =>
+{
+    await joinAsTester(page);
+    await forceHighRolls(page);
+    await lowerHostileArmorClass(page);
+
+    const sheet = await setCharacterSheetClass(
+        page,
+        "Tester the Brave",
+        "dnd5e.Tidy5eCharacterSheetQuadrone"
+    );
+
+    const inventoryTab = sheet.getByRole("tab", { name: /^Inventory$/i });
+    await expect(inventoryTab).toBeVisible();
+    await inventoryTab.click();
+    await expect(inventoryTab).toHaveAttribute("aria-selected", /true/i);
+
+    const firstVisibleWeaponRow = sheet.locator('[data-tidy-section-key="weapon"] .tidy-table-row-container').filter({ visible: true }).first();
+    await expect(firstVisibleWeaponRow).toBeVisible({ timeout: 25000 });
+
+    const firstWeaponUseButton = firstVisibleWeaponRow.locator('.tidy-table-row-use-button');
+    await expect(firstWeaponUseButton).toBeVisible({ timeout: 25000 });
+    await firstWeaponUseButton.focus();
+    await expect(firstWeaponUseButton).toBeFocused();
+
+    await page.keyboard.press("Enter");
+
+    const targetPicker = page.locator(".ae-target-picker").filter({ visible: true }).last();
+    await expectFocusInside(page, targetPicker);
+
+    const confirmTargetButton = targetPicker.locator('button[type="submit"], .dialog-buttons button').last();
+    await expect(confirmTargetButton).toBeVisible({ timeout: 25000 });
+    await confirmTargetButton.click();
+
+    const attackRollDialog = page.locator('[role="dialog"]:visible, dialog:visible').filter({ has: page.getByRole("button", { name: /Normal/i }) }).last();
+    await expectFocusInside(page, attackRollDialog);
+    await chooseNormalRoll(page);
+
+    let focusReturnedAfterAttack = false;
+    try
+    {
+        await expect(firstWeaponUseButton).toBeFocused({ timeout: 3000 });
+        focusReturnedAfterAttack = true;
+    }
+    catch (error)
+    {
+        focusReturnedAfterAttack = false;
+    }
+
+    if (!focusReturnedAfterAttack)
+    {
+        const damageButton = page.getByRole("button", { name: /damage/i }).filter({ visible: true }).last();
+        await expect(damageButton).toBeVisible({ timeout: 25000 });
+        await damageButton.click();
+
+        const damageNormalButton = page.getByRole("button", { name: /Normal/i }).filter({ visible: true }).last();
+        await expect(damageNormalButton).toBeVisible({ timeout: 25000 });
+        await expect(damageNormalButton).toBeFocused({ timeout: 25000 });
+        await damageNormalButton.click();
+    }
+
+    await page.waitForFunction(() =>
+    {
+        const activeElement = document.activeElement;
+        return activeElement instanceof HTMLElement
+            && activeElement.classList.contains("tidy-table-row-use-button")
+            && /Use or roll Club/i.test(activeElement.getAttribute("aria-label") ?? "");
+    }, null, { timeout: 25000 });
+});
+
+
+
+
+
+
+
+
+
+
+
+

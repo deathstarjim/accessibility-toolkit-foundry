@@ -2,7 +2,7 @@
   "id": "accessibility-toolkit-foundry",
   "title": "Accessibility Toolkit",
   "description": "Accessibility toolkit for Foundry VTT, currently focused on D&D 5e support",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "authors": [
     {
       "name": "DeathStar Jim"
@@ -30,7 +30,7 @@
   ],
   "url": "https://github.com/deathstarjim/accessibility-toolkit-foundry",
   "manifest": "https://github.com/deathstarjim/accessibility-toolkit-foundry/releases/latest/download/module.json",
-  "download": "https://github.com/deathstarjim/accessibility-toolkit-foundry/releases/download/0.5.1/module.zip",
+  "download": "https://github.com/deathstarjim/accessibility-toolkit-foundry/releases/download/1.0.0/module.zip",
   "readme": "https://github.com/deathstarjim/accessibility-toolkit-foundry#readme",
   "changelog": "https://github.com/deathstarjim/accessibility-toolkit-foundry#changelog"
 }
