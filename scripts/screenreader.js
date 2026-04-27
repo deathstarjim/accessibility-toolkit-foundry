@@ -270,6 +270,19 @@ Hooks.on("ready", () =>
     document.addEventListener("keyup", handleKeybindingsControlsKeyEvent, true);
 });
 
+Hooks.on("renderSettingsConfig", () =>
+{
+    const moduleId = "accessibility-toolkit-foundry";
+
+    requestAnimationFrame(() =>
+    {
+        requestAnimationFrame(() =>
+        {
+            enhanceAccessibilitySettingsPanel(moduleId);
+        });
+    });
+});
+
 // ---------------------------------------------------------------------------
 // Announcement helpers
 // ---------------------------------------------------------------------------
@@ -312,6 +325,7 @@ globalThis.AEAnnounce = {
 const AE_ANNOUNCED_ROLL_MESSAGES = new Map();
 const AE_PREUPDATE_HP = new Map();
 const AE_CONDITION_ANNOUNCEMENT_CACHE = new Map();
+const AE_SETTINGS_ANNOUNCEMENT_CACHE = new Map();
 
 function getRenderedApplicationRoot(html)
 {
@@ -334,6 +348,23 @@ function normalizeAnnouncementText(text)
 function getSpeakerName(message)
 {
     return message.speaker?.alias || message.author?.name || game.i18n.localize("Unknown");
+}
+
+function getModuleSettingsTabButton(moduleId)
+{
+    const selectors = [
+        `.settings-sidebar button[data-tab="${moduleId}"]`,
+        `.tabs button[data-tab="${moduleId}"]`,
+        `[data-application-part="sidebar"] button[data-tab="${moduleId}"]`,
+    ];
+
+    for (const selector of selectors)
+    {
+        const button = document.querySelector(selector);
+        if (button instanceof HTMLElement) return button;
+    }
+
+    return null;
 }
 
 function getKeybindingsConfigRoot()
@@ -834,6 +865,142 @@ async function openAccessibilitySettings()
 
     setTimeout(focusModuleTab, 250);
     return true;
+}
+
+function getSettingGroupLabel(group)
+{
+    if (!(group instanceof HTMLElement)) return "";
+
+    const label = group.querySelector("label, .form-header, h3, h4");
+    return normalizeAnnouncementText(label?.textContent ?? "");
+}
+
+function getSettingGroupHint(group)
+{
+    if (!(group instanceof HTMLElement)) return "";
+
+    const hint = group.querySelector(".notes, .hint, p");
+    return normalizeAnnouncementText(hint?.textContent ?? "");
+}
+
+function getSettingGroupValue(group)
+{
+    if (!(group instanceof HTMLElement)) return "";
+
+    const checkbox = group.querySelector('input[type="checkbox"]');
+    if (checkbox instanceof HTMLInputElement) return checkbox.checked ? "On" : "Off";
+
+    const select = group.querySelector("select");
+    if (select instanceof HTMLSelectElement)
+    {
+        return normalizeAnnouncementText(select.selectedOptions?.[0]?.textContent ?? select.value ?? "");
+    }
+
+    const textInput = group.querySelector('input:not([type="hidden"]):not([type="checkbox"]), textarea');
+    if (textInput instanceof HTMLInputElement || textInput instanceof HTMLTextAreaElement)
+    {
+        return normalizeAnnouncementText(textInput.value ?? "");
+    }
+
+    return "";
+}
+
+function buildSettingAnnouncement(group)
+{
+    const label = getSettingGroupLabel(group);
+    if (!label) return "";
+
+    const hint = getSettingGroupHint(group);
+    const value = getSettingGroupValue(group);
+    const parts = [label];
+
+    if (value) parts.push(`Current value: ${value}.`);
+    if (hint) parts.push(hint);
+
+    return parts.join(". ").replace(/\.\s+\./g, ". ");
+}
+
+function shouldAnnounceSettingsGroup(group, triggerType)
+{
+    const label = getSettingGroupLabel(group);
+    if (!label) return false;
+
+    const cacheKey = `${triggerType}:${label}`;
+    const now = Date.now();
+    const previous = AE_SETTINGS_ANNOUNCEMENT_CACHE.get(cacheKey);
+    if (previous && (now - previous) < 750) return false;
+
+    AE_SETTINGS_ANNOUNCEMENT_CACHE.set(cacheKey, now);
+    if (AE_SETTINGS_ANNOUNCEMENT_CACHE.size > 100)
+    {
+        const oldestKey = AE_SETTINGS_ANNOUNCEMENT_CACHE.keys().next().value;
+        if (oldestKey) AE_SETTINGS_ANNOUNCEMENT_CACHE.delete(oldestKey);
+    }
+
+    return true;
+}
+
+function announceSettingsGroup(group, triggerType = "focus")
+{
+    if (!shouldAnnounceSettingsGroup(group, triggerType)) return;
+
+    const announcement = buildSettingAnnouncement(group);
+    if (!announcement) return;
+
+    announcePolite(announcement);
+}
+
+function enhanceAccessibilitySettingsGroup(group)
+{
+    if (!(group instanceof HTMLElement)) return;
+    if (group.dataset.aeSettingsEnhanced === "true") return;
+
+    const label = getSettingGroupLabel(group);
+    if (!label) return;
+
+    const hint = getSettingGroupHint(group);
+    const controls = group.querySelectorAll("input:not([type='hidden']), select, textarea, button");
+
+    for (const control of controls)
+    {
+        if (!(control instanceof HTMLElement)) continue;
+
+        if (!control.getAttribute("aria-label"))
+        {
+            const value = getSettingGroupValue(group);
+            const ariaParts = [label];
+            if (value) ariaParts.push(`Current value ${value}`);
+            if (hint) ariaParts.push(hint);
+            control.setAttribute("aria-label", ariaParts.join(". "));
+        }
+
+        control.addEventListener("focus", () => announceSettingsGroup(group, "focus"), true);
+        control.addEventListener("mouseenter", () => announceSettingsGroup(group, "hover"), true);
+    }
+
+    group.addEventListener("mouseenter", () => announceSettingsGroup(group, "hover"), true);
+    group.dataset.aeSettingsEnhanced = "true";
+}
+
+function enhanceAccessibilitySettingsPanel(moduleId)
+{
+    const panel = getAccessibilitySettingsPanel(moduleId);
+    if (!(panel instanceof HTMLElement)) return false;
+
+    const tabButton = getModuleSettingsTabButton(moduleId);
+    if (tabButton instanceof HTMLElement && !tabButton.getAttribute("aria-label"))
+    {
+        const tabLabel = normalizeAnnouncementText(tabButton.textContent ?? "Accessibility Toolkit Foundry");
+        tabButton.setAttribute("aria-label", `${tabLabel} settings`);
+    }
+
+    const groups = panel.querySelectorAll(".form-group");
+    for (const group of groups)
+    {
+        enhanceAccessibilitySettingsGroup(group);
+    }
+
+    return groups.length > 0;
 }
 
 async function openConfigureControls()

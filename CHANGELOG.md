@@ -1,3 +1,14 @@
+### v1.0.1
+
+- Renamed and normalized the module around the `accessibility-toolkit-foundry` ID so Foundry settings, keybindings, and bundled audio assets resolve correctly after the module rename.
+- Fixed stale internal module-ID references that were preventing the module from appearing reliably under `Accessibility Toolkit Foundry` in Configure Settings.
+- Corrected bundled audio cue paths for `open.wav` and `equip.wav` so they load from the current module directory without 404s.
+- Improved screen-reader support in Configure Settings by enhancing the Accessibility Toolkit settings controls with stronger labels and spoken hints on focus.
+- Added spoken narration for attack and damage roll dialogs so screen-reader users get immediate context and action guidance when the combat tunnel opens.
+- Refactored the combat-tunnel activation path to be row-centric instead of tab-centric, improving reliability when focus lands on sub-elements like Tidy 5e item images.
+- Split combat activation and inventory activation concerns into dedicated helper modules to keep `scripts/sheettabs.js` from growing into another monolithic file.
+- Verified the rename cleanup and row-centric combat flow with the Playwright `alt-t-smoke` suite.
+
 ### v0.5.1
 
 - Improved release packaging for GitHub/Forge installs by fixing the release workflow and module archive contents.
@@ -26,7 +37,6 @@ New features:
 - Added focus restoration back to the originating inventory/weapon row after attack and consumable flows complete.
 - Added automatic screen reader roll-result announcements and an `Alt+R` shortcut to re-read the latest roll result from chat.
 - Added `Enter` / `Shift+Enter` canvas token actions so the current keyboard token can open its actor sheet or be targeted without the mouse.
-- Added an `Alt+Shift+A` shortcut to open Configure Settings directly to Accessibility Enhancements and move focus into the first setting control for keyboard-only configuration.
+- Added an `Alt+Shift+A` shortcut to open Configure Settings directly to Accessibility Toolkit Foundry and move focus into the first setting control for keyboard-only configuration.
 - Added an `Alt+Shift+K` shortcut to open Configure Controls directly and move focus into the keybinding controls for keyboard-only remapping.
 - Added an `Alt+C` shortcut to open the current player's character sheet without first finding a token on the canvas.
-
