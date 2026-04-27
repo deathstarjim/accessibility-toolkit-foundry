@@ -1,9 +1,9 @@
-const NOTIFICATIONSOUND = new Audio("/modules/accessibility-enhancements/assets/open.wav");
-const CREATEITEMSOUND = new Audio("/modules/accessibility-enhancements/assets/equip.wav");
+const NOTIFICATIONSOUND = new Audio("/modules/accessibility-toolkit-foundry/assets/open.wav");
+const CREATEITEMSOUND = new Audio("/modules/accessibility-toolkit-foundry/assets/equip.wav");
 
 Hooks.on("init", () =>
 {
-    game.settings.register('accessibility-enhancements', 'enableSoundEffects', {
+    game.settings.register('accessibility-toolkit-foundry', 'enableSoundEffects', {
         name: 'Enable Sound Effects',
         hint: 'Disable to stop the "pop" sound when rendering applications and the rustling sound when items are created.',
         scope: 'client',
@@ -19,7 +19,7 @@ Hooks.on("renderApplication", (app) =>
 {
     // Exclude the PF2E effects panel which re-renders constantly
     if (app.constructor?.name === "EffectsPanel") return;
-    if (game.settings.get('accessibility-enhancements', 'enableSoundEffects') === true)
+    if (game.settings.get('accessibility-toolkit-foundry', 'enableSoundEffects') === true)
     {
         NOTIFICATIONSOUND.play();
     }
@@ -32,7 +32,7 @@ Hooks.on("renderApplicationV2", (app, html, context, options) =>
     if (!options?.isFirstRender) return;
     // Exclude the PF2E effects panel
     if (app.constructor?.name === "EffectsPanel") return;
-    if (game.settings.get('accessibility-enhancements', 'enableSoundEffects') === true)
+    if (game.settings.get('accessibility-toolkit-foundry', 'enableSoundEffects') === true)
     {
         NOTIFICATIONSOUND.play();
     }
@@ -41,7 +41,7 @@ Hooks.on("renderApplicationV2", (app, html, context, options) =>
 Hooks.on("createItem", () =>
 {
     // Play a sound when an item is created
-    if (game.settings.get('accessibility-enhancements', 'enableSoundEffects') === true)
+    if (game.settings.get('accessibility-toolkit-foundry', 'enableSoundEffects') === true)
     {
         CREATEITEMSOUND.play();
     }

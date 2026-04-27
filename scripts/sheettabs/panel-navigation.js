@@ -201,8 +201,8 @@ export function isInventoryKeyboardActionTarget(element)
 {
     if (!(element instanceof HTMLElement)) return false;
 
-    return element.matches(
-        ".item-name, .tidy-table-row-use-button, .item-toggle, .command.decrementer, .command.incrementer, .tidy-table-button, .button.button-icon-only"
+    return !!element.closest(
+        ".item-name, .item-image, .rollable, .tidy-table-row-use-button, .item-toggle, .command.decrementer, .command.incrementer, .tidy-table-button, .button.button-icon-only"
     ) || isLikelyInventoryMenuTrigger(element);
 }
 

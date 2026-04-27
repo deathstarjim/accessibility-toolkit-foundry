@@ -1,7 +1,7 @@
 Hooks.on("init", () =>
 {
 
-    game.settings.register('accessibility-enhancements', 'highContrastMode', {
+    game.settings.register('accessibility-toolkit-foundry', 'highContrastMode', {
         name: 'High Contrast Character Sheets',
         hint: 'Removes colours on character sheets to improve contrast & visibility. Supports D&D 5e (dnd5e2) character sheets. Tidy 5e Sheets support coming soon.',
         scope: 'client',
@@ -19,11 +19,11 @@ Hooks.on("init", () =>
 
 Hooks.on("renderActorSheet", () =>
 {
-    if (game.settings.get('accessibility-enhancements', 'highContrastMode') !== "default")
+    if (game.settings.get('accessibility-toolkit-foundry', 'highContrastMode') !== "default")
     {
         for (const element of document.querySelectorAll(".sheet.character"))
         {
-            let mode = game.settings.get('accessibility-enhancements', 'highContrastMode');
+            let mode = game.settings.get('accessibility-toolkit-foundry', 'highContrastMode');
             element.classList.add("high-contrast");
             element.classList.add(mode);
         }

@@ -1,5 +1,76 @@
 import { isRenderedElement } from "./tab-helpers.js";
 
+function getScreenReaderAnnouncer(preferredMode = "assertive")
+{
+    const announcer = globalThis.AEAnnounce ?? {};
+    const preferred = announcer?.[preferredMode];
+    if (typeof preferred === "function") return preferred;
+    if (typeof announcer?.polite === "function") return announcer.polite;
+    if (typeof announcer?.assertive === "function") return announcer.assertive;
+    return null;
+}
+
+function getVisibleButtonLabels(root)
+{
+    if (!(root instanceof HTMLElement)) return [];
+
+    const labels = [];
+    for (const button of root.querySelectorAll("button"))
+    {
+        if (!isRenderedElement(button)) continue;
+        const label = button.getAttribute("aria-label")?.trim() || button.textContent?.trim() || "";
+        if (!label) continue;
+        if (!labels.includes(label)) labels.push(label);
+    }
+
+    return labels;
+}
+
+function getDialogAnnouncement(root, context = {})
+{
+    if (!(root instanceof HTMLElement)) return "";
+
+    const titleText = root.querySelector(".window-title")?.textContent?.trim() ?? "";
+    const normalizedTitle = titleText.toLowerCase();
+    const itemName = context.itemName?.trim() ?? "";
+    const targetName = context.targetName?.trim() ?? "";
+    const buttonLabels = getVisibleButtonLabels(root).filter(label => !/^close window$/i.test(label));
+
+    if (context.type === "attack-roll" || normalizedTitle === "attack roll")
+    {
+        const intro = itemName ? `Attacking with ${itemName}.` : "Attack roll dialog opened.";
+        const target = targetName ? ` Target is ${targetName}.` : "";
+        const options = buttonLabels.length ? ` Options: ${buttonLabels.join(", ")}.` : "";
+        return `${intro}${target} Review the attack options, then press Enter on your choice.${options}`.trim();
+    }
+
+    if (context.type === "damage-roll" || normalizedTitle === "damage roll")
+    {
+        const intro = itemName ? `Rolling damage for ${itemName}.` : "Damage roll dialog opened.";
+        const target = targetName ? ` Target is ${targetName}.` : "";
+        const options = buttonLabels.length ? ` Options: ${buttonLabels.join(", ")}.` : "";
+        return `${intro}${target} Review the damage options, then press Enter on your choice.${options}`.trim();
+    }
+
+    if (context.type === "healing-roll" || normalizedTitle === "healing roll")
+    {
+        const intro = itemName ? `Rolling healing for ${itemName}.` : "Healing roll dialog opened.";
+        const options = buttonLabels.length ? ` Options: ${buttonLabels.join(", ")}.` : "";
+        return `${intro} Review the healing options, then press Enter on your choice.${options}`.trim();
+    }
+
+    return "";
+}
+
+function announceDialog(root, context = {})
+{
+    const announcement = getDialogAnnouncement(root, context);
+    if (!announcement) return;
+
+    const announce = getScreenReaderAnnouncer(context.mode ?? "assertive");
+    announce?.(announcement);
+}
+
 export function showAccessibleTargetPicker({ app, itemName, candidates, debug = null })
 {
     return new Promise(resolve =>
@@ -214,6 +285,7 @@ export function focusActivationResult(previousWindowIds, {
     originatingApp = null,
     debug = null,
     getApplicationElement,
+    announceContext = null,
 } = {})
 {
     let tries = 12;
@@ -231,6 +303,7 @@ export function focusActivationResult(previousWindowIds, {
             if (windowTarget)
             {
                 windowTarget.focus({ preventScroll: false });
+                announceDialog(newWindow, announceContext ?? {});
                 debug?.("focused activation new window target", {
                     sourceWindowId: getApplicationIdentity(newWindow),
                     targetTag: windowTarget.tagName,
@@ -248,6 +321,7 @@ export function focusActivationResult(previousWindowIds, {
             if (windowTarget)
             {
                 windowTarget.focus({ preventScroll: false });
+                announceDialog(windowRoot, announceContext ?? {});
                 debug?.("focused activation window target", {
                     sourceWindowId: activeWindow.id,
                     sourceWindowClass: activeWindow.constructor?.name,

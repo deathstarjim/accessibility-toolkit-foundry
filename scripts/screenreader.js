@@ -16,7 +16,7 @@
 Hooks.on("init", () =>
 {
 
-    game.settings.register('accessibility-enhancements', 'announceChatMessages', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceChatMessages', {
         name: 'Announce Chat Messages',
         hint: 'Screen reader will announce incoming chat messages as they arrive.',
         scope: 'client',
@@ -26,7 +26,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceRollResults', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceRollResults', {
         name: 'Announce Roll Results',
         hint: 'Screen reader announces dice roll flavor and totals when roll cards appear in chat.',
         scope: 'client',
@@ -36,7 +36,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceCombatTurns', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceCombatTurns', {
         name: 'Announce Combat Turns',
         hint: 'Screen reader announces when the active combatant changes. You will get a louder alert when it is your own turn.',
         scope: 'client',
@@ -46,7 +46,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceNotifications', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceNotifications', {
         name: 'Announce UI Notifications',
         hint: 'Screen reader announces Foundry info/warning/error pop-up notifications.',
         scope: 'client',
@@ -56,7 +56,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceTokenMove', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceTokenMove', {
         name: 'Announce Token Movement',
         hint: 'Screen reader announces when your owned tokens move, including their new grid coordinate.',
         scope: 'client',
@@ -66,7 +66,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceTokenCreateDelete', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceTokenCreateDelete', {
         name: 'Announce Tokens Entering/Leaving Scene',
         hint: 'Screen reader announces when tokens are added to or removed from the current scene.',
         scope: 'client',
@@ -76,7 +76,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceHpChanges', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceHpChanges', {
         name: 'Announce HP / Damage Changes',
         hint: 'Screen reader announces damage, healing, and temporary HP changes for owned actors.',
         scope: 'client',
@@ -86,7 +86,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceConditions', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceConditions', {
         name: 'Announce Status Effects / Conditions',
         hint: 'Screen reader announces when conditions or active effects are applied to or removed from owned actors.',
         scope: 'client',
@@ -96,7 +96,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.keybindings.register('accessibility-enhancements', 'whereAmI', {
+    game.keybindings.register('accessibility-toolkit-foundry', 'whereAmI', {
         name: 'Where Am I — Read Position & Status',
         hint: "Announces the controlled token's grid position, HP, and active conditions via the screen reader.",
         editable: [{ key: 'KeyW' }],
@@ -120,7 +120,7 @@ Hooks.on("init", () =>
         },
     });
 
-    game.keybindings.register('accessibility-enhancements', 'readLastRollResult', {
+    game.keybindings.register('accessibility-toolkit-foundry', 'readLastRollResult', {
         name: 'Read Last Roll Result',
         hint: 'Announces the most recent roll result from chat.',
         editable: [{ key: 'KeyR', modifiers: ['Alt'] }],
@@ -145,7 +145,7 @@ Hooks.on("init", () =>
         },
     });
 
-    game.keybindings.register('accessibility-enhancements', 'openAccessibilitySettings', {
+    game.keybindings.register('accessibility-toolkit-foundry', 'openAccessibilitySettings', {
         name: 'Open Accessibility Settings',
         hint: 'Opens Configure Settings and focuses the Accessibility Enhancements settings tab.',
         editable: [{ key: 'KeyA', modifiers: ['Alt', 'Shift'] }],
@@ -156,7 +156,7 @@ Hooks.on("init", () =>
         },
     });
 
-    game.keybindings.register('accessibility-enhancements', 'openConfigureControls', {
+    game.keybindings.register('accessibility-toolkit-foundry', 'openConfigureControls', {
         name: 'Open Configure Controls',
         hint: 'Opens Foundry Configure Controls. Default: Alt+Shift+K. In binding capture fields, use Alt+Backspace to cancel. You can change this in Configure Controls.',
         editable: [{ key: 'KeyK', modifiers: ['Alt', 'Shift'] }],
@@ -167,7 +167,7 @@ Hooks.on("init", () =>
         },
     });
 
-    game.keybindings.register('accessibility-enhancements', 'openMyCharacterSheet', {
+    game.keybindings.register('accessibility-toolkit-foundry', 'openMyCharacterSheet', {
         name: 'Open My Character Sheet',
         hint: 'Opens your current character sheet using your controlled token first, then your assigned character. Default: Alt+C. You can change this in Configure Controls.',
         editable: [{ key: 'KeyC', modifiers: ['Alt'] }],
@@ -270,6 +270,19 @@ Hooks.on("ready", () =>
     document.addEventListener("keyup", handleKeybindingsControlsKeyEvent, true);
 });
 
+Hooks.on("renderSettingsConfig", () =>
+{
+    const moduleId = "accessibility-toolkit-foundry";
+
+    requestAnimationFrame(() =>
+    {
+        requestAnimationFrame(() =>
+        {
+            enhanceAccessibilitySettingsPanel(moduleId);
+        });
+    });
+});
+
 // ---------------------------------------------------------------------------
 // Announcement helpers
 // ---------------------------------------------------------------------------
@@ -312,6 +325,7 @@ globalThis.AEAnnounce = {
 const AE_ANNOUNCED_ROLL_MESSAGES = new Map();
 const AE_PREUPDATE_HP = new Map();
 const AE_CONDITION_ANNOUNCEMENT_CACHE = new Map();
+const AE_SETTINGS_ANNOUNCEMENT_CACHE = new Map();
 
 function getRenderedApplicationRoot(html)
 {
@@ -334,6 +348,23 @@ function normalizeAnnouncementText(text)
 function getSpeakerName(message)
 {
     return message.speaker?.alias || message.author?.name || game.i18n.localize("Unknown");
+}
+
+function getModuleSettingsTabButton(moduleId)
+{
+    const selectors = [
+        `.settings-sidebar button[data-tab="${moduleId}"]`,
+        `.tabs button[data-tab="${moduleId}"]`,
+        `[data-application-part="sidebar"] button[data-tab="${moduleId}"]`,
+    ];
+
+    for (const selector of selectors)
+    {
+        const button = document.querySelector(selector);
+        if (button instanceof HTMLElement) return button;
+    }
+
+    return null;
 }
 
 function getKeybindingsConfigRoot()
@@ -531,7 +562,7 @@ function shouldAnnounceConditionEvent(key)
 
 function announceConditionChange(document, action)
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceConditions')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceConditions')) return;
     if (!isConditionLikeDocument(document)) return;
 
     const actor = document.parent?.documentName === "Actor" ? document.parent : null;
@@ -780,8 +811,8 @@ function focusFirstAccessibilitySetting(moduleId)
 
 async function openAccessibilitySettings()
 {
-    const moduleId = "accessibility-enhancements";
-    const moduleTitle = game.modules.get(moduleId)?.title ?? "Accessibility Enhancements";
+    const moduleId = "accessibility-toolkit-foundry";
+    const moduleTitle = game.modules.get(moduleId)?.title ?? "Accessibility Toolkit Foundry";
     const SettingsConfigClass = foundry?.applications?.settings?.SettingsConfig ?? globalThis.SettingsConfig;
 
     if (!SettingsConfigClass)
@@ -834,6 +865,142 @@ async function openAccessibilitySettings()
 
     setTimeout(focusModuleTab, 250);
     return true;
+}
+
+function getSettingGroupLabel(group)
+{
+    if (!(group instanceof HTMLElement)) return "";
+
+    const label = group.querySelector("label, .form-header, h3, h4");
+    return normalizeAnnouncementText(label?.textContent ?? "");
+}
+
+function getSettingGroupHint(group)
+{
+    if (!(group instanceof HTMLElement)) return "";
+
+    const hint = group.querySelector(".notes, .hint, p");
+    return normalizeAnnouncementText(hint?.textContent ?? "");
+}
+
+function getSettingGroupValue(group)
+{
+    if (!(group instanceof HTMLElement)) return "";
+
+    const checkbox = group.querySelector('input[type="checkbox"]');
+    if (checkbox instanceof HTMLInputElement) return checkbox.checked ? "On" : "Off";
+
+    const select = group.querySelector("select");
+    if (select instanceof HTMLSelectElement)
+    {
+        return normalizeAnnouncementText(select.selectedOptions?.[0]?.textContent ?? select.value ?? "");
+    }
+
+    const textInput = group.querySelector('input:not([type="hidden"]):not([type="checkbox"]), textarea');
+    if (textInput instanceof HTMLInputElement || textInput instanceof HTMLTextAreaElement)
+    {
+        return normalizeAnnouncementText(textInput.value ?? "");
+    }
+
+    return "";
+}
+
+function buildSettingAnnouncement(group)
+{
+    const label = getSettingGroupLabel(group);
+    if (!label) return "";
+
+    const hint = getSettingGroupHint(group);
+    const value = getSettingGroupValue(group);
+    const parts = [label];
+
+    if (value) parts.push(`Current value: ${value}.`);
+    if (hint) parts.push(hint);
+
+    return parts.join(". ").replace(/\.\s+\./g, ". ");
+}
+
+function shouldAnnounceSettingsGroup(group, triggerType)
+{
+    const label = getSettingGroupLabel(group);
+    if (!label) return false;
+
+    const cacheKey = `${triggerType}:${label}`;
+    const now = Date.now();
+    const previous = AE_SETTINGS_ANNOUNCEMENT_CACHE.get(cacheKey);
+    if (previous && (now - previous) < 750) return false;
+
+    AE_SETTINGS_ANNOUNCEMENT_CACHE.set(cacheKey, now);
+    if (AE_SETTINGS_ANNOUNCEMENT_CACHE.size > 100)
+    {
+        const oldestKey = AE_SETTINGS_ANNOUNCEMENT_CACHE.keys().next().value;
+        if (oldestKey) AE_SETTINGS_ANNOUNCEMENT_CACHE.delete(oldestKey);
+    }
+
+    return true;
+}
+
+function announceSettingsGroup(group, triggerType = "focus")
+{
+    if (!shouldAnnounceSettingsGroup(group, triggerType)) return;
+
+    const announcement = buildSettingAnnouncement(group);
+    if (!announcement) return;
+
+    announcePolite(announcement);
+}
+
+function enhanceAccessibilitySettingsGroup(group)
+{
+    if (!(group instanceof HTMLElement)) return;
+    if (group.dataset.aeSettingsEnhanced === "true") return;
+
+    const label = getSettingGroupLabel(group);
+    if (!label) return;
+
+    const hint = getSettingGroupHint(group);
+    const controls = group.querySelectorAll("input:not([type='hidden']), select, textarea, button");
+
+    for (const control of controls)
+    {
+        if (!(control instanceof HTMLElement)) continue;
+
+        if (!control.getAttribute("aria-label"))
+        {
+            const value = getSettingGroupValue(group);
+            const ariaParts = [label];
+            if (value) ariaParts.push(`Current value ${value}`);
+            if (hint) ariaParts.push(hint);
+            control.setAttribute("aria-label", ariaParts.join(". "));
+        }
+
+        control.addEventListener("focus", () => announceSettingsGroup(group, "focus"), true);
+        control.addEventListener("mouseenter", () => announceSettingsGroup(group, "hover"), true);
+    }
+
+    group.addEventListener("mouseenter", () => announceSettingsGroup(group, "hover"), true);
+    group.dataset.aeSettingsEnhanced = "true";
+}
+
+function enhanceAccessibilitySettingsPanel(moduleId)
+{
+    const panel = getAccessibilitySettingsPanel(moduleId);
+    if (!(panel instanceof HTMLElement)) return false;
+
+    const tabButton = getModuleSettingsTabButton(moduleId);
+    if (tabButton instanceof HTMLElement && !tabButton.getAttribute("aria-label"))
+    {
+        const tabLabel = normalizeAnnouncementText(tabButton.textContent ?? "Accessibility Toolkit Foundry");
+        tabButton.setAttribute("aria-label", `${tabLabel} settings`);
+    }
+
+    const groups = panel.querySelectorAll(".form-group");
+    for (const group of groups)
+    {
+        enhanceAccessibilitySettingsGroup(group);
+    }
+
+    return groups.length > 0;
 }
 
 async function openConfigureControls()
@@ -907,7 +1074,7 @@ function shouldAnnounceRollMessage(message, announcement)
 
 function announceRollResult(message, root = null)
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceRollResults')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceRollResults')) return;
 
     const announcement = getRollAnnouncement(message, root);
     if (!shouldAnnounceRollMessage(message, announcement)) return;
@@ -985,20 +1152,20 @@ globalThis.AEGrid = { getGridLabel, getHPString, getConditionsString };
 
 Hooks.on("createChatMessage", (message) =>
 {
-    if (game.settings.get('accessibility-enhancements', 'announceRollResults') && (message.isRoll || message.rolls?.length))
+    if (game.settings.get('accessibility-toolkit-foundry', 'announceRollResults') && (message.isRoll || message.rolls?.length))
     {
         announceRollResult(message);
         return;
     }
 
-    if (!game.settings.get('accessibility-enhancements', 'announceChatMessages')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceChatMessages')) return;
     const announcement = getChatMessageAnnouncement(message);
     if (announcement) announcePolite(announcement);
 });
 
 Hooks.on("updateChatMessage", (message, changed) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceRollResults')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceRollResults')) return;
     if (!("rolls" in changed) && !("content" in changed) && !("flavor" in changed)) return;
     if (!(message.isRoll || message.rolls?.length)) return;
 
@@ -1016,7 +1183,7 @@ Hooks.on("renderChatMessageHTML", (message, html) =>
 
 Hooks.on("preUpdateActor", (actor, changes) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceHpChanges')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceHpChanges')) return;
     if (!isOwnedActor(actor)) return;
     if (!hasHpChange(changes)) return;
 
@@ -1027,7 +1194,7 @@ Hooks.on("preUpdateActor", (actor, changes) =>
 
 Hooks.on("updateActor", (actor, changes) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceHpChanges')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceHpChanges')) return;
     if (!isOwnedActor(actor)) return;
     if (!hasHpChange(changes)) return;
 
@@ -1065,7 +1232,7 @@ Hooks.on("deleteItem", item =>
 
 Hooks.on("updateCombat", (combat, changed) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceCombatTurns')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceCombatTurns')) return;
 
     // Only act when the active turn or round actually changed
     if (!("turn" in changed) && !("round" in changed)) return;
@@ -1102,7 +1269,7 @@ let _lastNotificationCount = 0;
 
 Hooks.on("renderNotifications", (app, html) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceNotifications')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceNotifications')) return;
 
     // html may be HTMLElement (AppV2) or jQuery (AppV1)
     const root = html instanceof HTMLElement ? html : html[0];
@@ -1131,7 +1298,7 @@ Hooks.on("renderNotifications", (app, html) =>
 
 Hooks.on("updateToken", (tokenDoc, changes) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceTokenMove')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceTokenMove')) return;
     if (!("x" in changes) && !("y" in changes)) return;
 
     // Only announce for tokens the local player owns
@@ -1152,14 +1319,14 @@ Hooks.on("updateToken", (tokenDoc, changes) =>
 
 Hooks.on("createToken", (tokenDoc) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceTokenCreateDelete')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceTokenCreateDelete')) return;
     const name = tokenDoc.name ?? game.i18n.localize("Unknown");
     announcePolite(`${name} has entered the scene.`);
 });
 
 Hooks.on("deleteToken", (tokenDoc) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceTokenCreateDelete')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceTokenCreateDelete')) return;
     const name = tokenDoc.name ?? game.i18n.localize("Unknown");
     announcePolite(`${name} has left the scene.`);
 });

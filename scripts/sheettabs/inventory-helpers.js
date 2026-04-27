@@ -232,6 +232,11 @@ export function getInventoryControlLabel(element)
         return itemName ? `${itemName}. Press Enter to use or roll.` : "Item name. Press Enter to use or roll.";
     }
 
+    if (element.matches(".item-image, .rollable"))
+    {
+        return itemName ? `${itemName} image. Press Enter to use or roll.` : "Item image. Press Enter to use or roll.";
+    }
+
     if (element.matches(".item-toggle"))
     {
         return itemName ? `Toggle ${itemName}` : "Toggle item";
