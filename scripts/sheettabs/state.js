@@ -8,7 +8,7 @@ export const AE_SHEET_TABS_STATE = {
     lastAttackControlDescriptor: null,
 };
 
-export const AE_MODULE_ID = "accessibility-enhancements";
+export const AE_MODULE_ID = "accessibility-toolkit-foundry";
 export const AE_MODULE_SOCKET = `module.${AE_MODULE_ID}`;
 export const AE_SOCKET_ACTIONS = {
     APPLY_ROLL_RESULT: "applyRollResult",

@@ -1,5 +1,5 @@
 {
-  "name": "accessibility-enhancements",
+  "name": "accessibility-toolkit-foundry",
   "version": "1.0.0",
   "description": "> **Based on the original [Accessibility Enhancements](https://github.com/silvative/accessibility-enhancements) module by [Cora (silvative)](https://github.com/silvative). This fork adapts the module for D&D 5e (dnd5e2) on Foundry VTT v13.**",
   "main": "playwright.config.js",

@@ -14,7 +14,7 @@ Hooks.on("init", () =>
 {
 
     // Allows the keybinding to be toggled on and off.
-    game.settings.register('accessibility-enhancements', 'addItemHotkey', {
+    game.settings.register('accessibility-toolkit-foundry', 'addItemHotkey', {
         name: 'Enable "Add Item" Hotkey',
         hint: 'Adds a hotkey (X) which can be pressed in the compendium browser, compendium window, or compendium sidebar tab to add the hovered item to your character.',
         scope: 'client',
@@ -25,7 +25,7 @@ Hooks.on("init", () =>
     });
 
     // Allows the keybinding to be toggled on and off.
-    game.settings.register('accessibility-enhancements', 'addItemButton', {
+    game.settings.register('accessibility-toolkit-foundry', 'addItemButton', {
         name: 'Enable "Add Item" Button',
         hint: 'Adds a button to the compendium window which can be pressed to add the item to your character',
         scope: 'client',
@@ -36,7 +36,7 @@ Hooks.on("init", () =>
     });
 
     // Adds a keybinding which can add hovered items to the character sheet.
-    if (game.settings.get('accessibility-enhancements', 'addItemHotkey') === true)
+    if (game.settings.get('accessibility-toolkit-foundry', 'addItemHotkey') === true)
     {
         window.addEventListener('keydown', event =>
         {
@@ -75,7 +75,7 @@ Hooks.on("init", () =>
 Hooks.on("renderCompendium", (app, html) =>
 {
 
-    if (game.settings.get('accessibility-enhancements', 'addItemButton') !== true) return;
+    if (game.settings.get('accessibility-toolkit-foundry', 'addItemButton') !== true) return;
 
     // html may be an HTMLElement (AppV2) or a jQuery object (AppV1)
     const root = html instanceof HTMLElement ? html : html[0];

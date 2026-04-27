@@ -4,7 +4,7 @@ Hooks.on("init", () =>
 {
 
     /* WIP
-    game.settings.register('accessibility-enhancements', 'leftClickTarget', {
+    game.settings.register('accessibility-toolkit-foundry', 'leftClickTarget', {
         name: 'Left Click Target',
         hint: 'Left Click on unowned tokens to target them',
         scope: 'client',
@@ -15,7 +15,7 @@ Hooks.on("init", () =>
     });
     */
 
-    game.settings.register('accessibility-enhancements', 'leftClickTokenHUD', {
+    game.settings.register('accessibility-toolkit-foundry', 'leftClickTokenHUD', {
         name: 'Left Click TokenHUD',
         hint: 'Left Click on owned tokens opens the Token HUD (Core requires right click). Added to help a user who was playing on Ipad. Experimental, works but causes some odd behaviour if clicking rapidly',
         scope: 'client',
@@ -28,7 +28,7 @@ Hooks.on("init", () =>
 
 Hooks.on("controlToken", (token, controlled) =>
 {
-    if (game.settings.get('accessibility-enhancements', 'leftClickTokenHUD') === true)
+    if (game.settings.get('accessibility-toolkit-foundry', 'leftClickTokenHUD') === true)
     {
         if (controlled === true) canvas.hud.token.bind(token);
     }
@@ -129,7 +129,7 @@ window.addEventListener("keydown", event =>
 
 /* WIP
 window.addEventListener('click', event => {
-    if ( game.settings.get('accessibility-enhancements', 'leftClickTarget') === true ) {
+    if ( game.settings.get('accessibility-toolkit-foundry', 'leftClickTarget') === true ) {
             console.log(event);
     }
 })

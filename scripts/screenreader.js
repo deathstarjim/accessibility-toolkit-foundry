@@ -16,7 +16,7 @@
 Hooks.on("init", () =>
 {
 
-    game.settings.register('accessibility-enhancements', 'announceChatMessages', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceChatMessages', {
         name: 'Announce Chat Messages',
         hint: 'Screen reader will announce incoming chat messages as they arrive.',
         scope: 'client',
@@ -26,7 +26,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceRollResults', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceRollResults', {
         name: 'Announce Roll Results',
         hint: 'Screen reader announces dice roll flavor and totals when roll cards appear in chat.',
         scope: 'client',
@@ -36,7 +36,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceCombatTurns', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceCombatTurns', {
         name: 'Announce Combat Turns',
         hint: 'Screen reader announces when the active combatant changes. You will get a louder alert when it is your own turn.',
         scope: 'client',
@@ -46,7 +46,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceNotifications', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceNotifications', {
         name: 'Announce UI Notifications',
         hint: 'Screen reader announces Foundry info/warning/error pop-up notifications.',
         scope: 'client',
@@ -56,7 +56,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceTokenMove', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceTokenMove', {
         name: 'Announce Token Movement',
         hint: 'Screen reader announces when your owned tokens move, including their new grid coordinate.',
         scope: 'client',
@@ -66,7 +66,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceTokenCreateDelete', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceTokenCreateDelete', {
         name: 'Announce Tokens Entering/Leaving Scene',
         hint: 'Screen reader announces when tokens are added to or removed from the current scene.',
         scope: 'client',
@@ -76,7 +76,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceHpChanges', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceHpChanges', {
         name: 'Announce HP / Damage Changes',
         hint: 'Screen reader announces damage, healing, and temporary HP changes for owned actors.',
         scope: 'client',
@@ -86,7 +86,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.settings.register('accessibility-enhancements', 'announceConditions', {
+    game.settings.register('accessibility-toolkit-foundry', 'announceConditions', {
         name: 'Announce Status Effects / Conditions',
         hint: 'Screen reader announces when conditions or active effects are applied to or removed from owned actors.',
         scope: 'client',
@@ -96,7 +96,7 @@ Hooks.on("init", () =>
         onChange: () => { },
     });
 
-    game.keybindings.register('accessibility-enhancements', 'whereAmI', {
+    game.keybindings.register('accessibility-toolkit-foundry', 'whereAmI', {
         name: 'Where Am I — Read Position & Status',
         hint: "Announces the controlled token's grid position, HP, and active conditions via the screen reader.",
         editable: [{ key: 'KeyW' }],
@@ -120,7 +120,7 @@ Hooks.on("init", () =>
         },
     });
 
-    game.keybindings.register('accessibility-enhancements', 'readLastRollResult', {
+    game.keybindings.register('accessibility-toolkit-foundry', 'readLastRollResult', {
         name: 'Read Last Roll Result',
         hint: 'Announces the most recent roll result from chat.',
         editable: [{ key: 'KeyR', modifiers: ['Alt'] }],
@@ -145,7 +145,7 @@ Hooks.on("init", () =>
         },
     });
 
-    game.keybindings.register('accessibility-enhancements', 'openAccessibilitySettings', {
+    game.keybindings.register('accessibility-toolkit-foundry', 'openAccessibilitySettings', {
         name: 'Open Accessibility Settings',
         hint: 'Opens Configure Settings and focuses the Accessibility Enhancements settings tab.',
         editable: [{ key: 'KeyA', modifiers: ['Alt', 'Shift'] }],
@@ -156,7 +156,7 @@ Hooks.on("init", () =>
         },
     });
 
-    game.keybindings.register('accessibility-enhancements', 'openConfigureControls', {
+    game.keybindings.register('accessibility-toolkit-foundry', 'openConfigureControls', {
         name: 'Open Configure Controls',
         hint: 'Opens Foundry Configure Controls. Default: Alt+Shift+K. In binding capture fields, use Alt+Backspace to cancel. You can change this in Configure Controls.',
         editable: [{ key: 'KeyK', modifiers: ['Alt', 'Shift'] }],
@@ -167,7 +167,7 @@ Hooks.on("init", () =>
         },
     });
 
-    game.keybindings.register('accessibility-enhancements', 'openMyCharacterSheet', {
+    game.keybindings.register('accessibility-toolkit-foundry', 'openMyCharacterSheet', {
         name: 'Open My Character Sheet',
         hint: 'Opens your current character sheet using your controlled token first, then your assigned character. Default: Alt+C. You can change this in Configure Controls.',
         editable: [{ key: 'KeyC', modifiers: ['Alt'] }],
@@ -531,7 +531,7 @@ function shouldAnnounceConditionEvent(key)
 
 function announceConditionChange(document, action)
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceConditions')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceConditions')) return;
     if (!isConditionLikeDocument(document)) return;
 
     const actor = document.parent?.documentName === "Actor" ? document.parent : null;
@@ -780,8 +780,8 @@ function focusFirstAccessibilitySetting(moduleId)
 
 async function openAccessibilitySettings()
 {
-    const moduleId = "accessibility-enhancements";
-    const moduleTitle = game.modules.get(moduleId)?.title ?? "Accessibility Enhancements";
+    const moduleId = "accessibility-toolkit-foundry";
+    const moduleTitle = game.modules.get(moduleId)?.title ?? "Accessibility Toolkit Foundry";
     const SettingsConfigClass = foundry?.applications?.settings?.SettingsConfig ?? globalThis.SettingsConfig;
 
     if (!SettingsConfigClass)
@@ -907,7 +907,7 @@ function shouldAnnounceRollMessage(message, announcement)
 
 function announceRollResult(message, root = null)
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceRollResults')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceRollResults')) return;
 
     const announcement = getRollAnnouncement(message, root);
     if (!shouldAnnounceRollMessage(message, announcement)) return;
@@ -985,20 +985,20 @@ globalThis.AEGrid = { getGridLabel, getHPString, getConditionsString };
 
 Hooks.on("createChatMessage", (message) =>
 {
-    if (game.settings.get('accessibility-enhancements', 'announceRollResults') && (message.isRoll || message.rolls?.length))
+    if (game.settings.get('accessibility-toolkit-foundry', 'announceRollResults') && (message.isRoll || message.rolls?.length))
     {
         announceRollResult(message);
         return;
     }
 
-    if (!game.settings.get('accessibility-enhancements', 'announceChatMessages')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceChatMessages')) return;
     const announcement = getChatMessageAnnouncement(message);
     if (announcement) announcePolite(announcement);
 });
 
 Hooks.on("updateChatMessage", (message, changed) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceRollResults')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceRollResults')) return;
     if (!("rolls" in changed) && !("content" in changed) && !("flavor" in changed)) return;
     if (!(message.isRoll || message.rolls?.length)) return;
 
@@ -1016,7 +1016,7 @@ Hooks.on("renderChatMessageHTML", (message, html) =>
 
 Hooks.on("preUpdateActor", (actor, changes) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceHpChanges')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceHpChanges')) return;
     if (!isOwnedActor(actor)) return;
     if (!hasHpChange(changes)) return;
 
@@ -1027,7 +1027,7 @@ Hooks.on("preUpdateActor", (actor, changes) =>
 
 Hooks.on("updateActor", (actor, changes) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceHpChanges')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceHpChanges')) return;
     if (!isOwnedActor(actor)) return;
     if (!hasHpChange(changes)) return;
 
@@ -1065,7 +1065,7 @@ Hooks.on("deleteItem", item =>
 
 Hooks.on("updateCombat", (combat, changed) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceCombatTurns')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceCombatTurns')) return;
 
     // Only act when the active turn or round actually changed
     if (!("turn" in changed) && !("round" in changed)) return;
@@ -1102,7 +1102,7 @@ let _lastNotificationCount = 0;
 
 Hooks.on("renderNotifications", (app, html) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceNotifications')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceNotifications')) return;
 
     // html may be HTMLElement (AppV2) or jQuery (AppV1)
     const root = html instanceof HTMLElement ? html : html[0];
@@ -1131,7 +1131,7 @@ Hooks.on("renderNotifications", (app, html) =>
 
 Hooks.on("updateToken", (tokenDoc, changes) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceTokenMove')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceTokenMove')) return;
     if (!("x" in changes) && !("y" in changes)) return;
 
     // Only announce for tokens the local player owns
@@ -1152,14 +1152,14 @@ Hooks.on("updateToken", (tokenDoc, changes) =>
 
 Hooks.on("createToken", (tokenDoc) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceTokenCreateDelete')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceTokenCreateDelete')) return;
     const name = tokenDoc.name ?? game.i18n.localize("Unknown");
     announcePolite(`${name} has entered the scene.`);
 });
 
 Hooks.on("deleteToken", (tokenDoc) =>
 {
-    if (!game.settings.get('accessibility-enhancements', 'announceTokenCreateDelete')) return;
+    if (!game.settings.get('accessibility-toolkit-foundry', 'announceTokenCreateDelete')) return;
     const name = tokenDoc.name ?? game.i18n.localize("Unknown");
     announcePolite(`${name} has left the scene.`);
 });

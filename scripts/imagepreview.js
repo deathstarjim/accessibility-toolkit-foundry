@@ -1,6 +1,6 @@
 Hooks.on("init", () => {
 
-    game.settings.register('accessibility-enhancements', 'imagePreview', {
+    game.settings.register('accessibility-toolkit-foundry', 'imagePreview', {
         name: 'Compendium Browser Portraits Preview',
         hint: 'Adds a tooltip to the character portrait previews in the compendium browser, expanding the artwork on hover to make it easier to see.',
         scope: 'client',
@@ -20,9 +20,9 @@ Hooks.on("init", () => {
 })
 
 Hooks.on("renderCompendiumBrowser", () => {
-    if ( game.settings.get('accessibility-enhancements', 'imagePreview') !== "off" ) {
+    if ( game.settings.get('accessibility-toolkit-foundry', 'imagePreview') !== "off" ) {
         for (const element of document.querySelectorAll("#compendium-browser")) {
-            let value = game.settings.get('accessibility-enhancements', 'imagePreview');
+            let value = game.settings.get('accessibility-toolkit-foundry', 'imagePreview');
             element.setAttribute("imagePreview", value);
         }
     }
