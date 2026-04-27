@@ -1,6 +1,6 @@
 {
   "id": "accessibility-toolkit-foundry",
-  "title": "Accessibility Toolkit",
+  "title": "Accessibility Toolkit Foundry",
   "description": "Accessibility toolkit for Foundry VTT, currently focused on D&D 5e support",
   "version": "1.0.0",
   "authors": [
